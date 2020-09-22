@@ -3,49 +3,64 @@ package banking;
 import java.util.Random;
 
 public class Account {
-    private String cardNumber;
-    private String pin;
-    private double balance = 0;
-
-    // create constants to set minimum and maximum PIN number
+    /**
+     * Constants used to generate card numbers.
+     */
     private static final String IIN = "400000";
     private static final int ACCOUNT_NUM_LENGTH = 9;
-    // constant for luhn algorithm max number
     private static final int LUHN_MAX = 9;
     private static final int CHECK_SUM_UPPER_BOUND = 10;
 
+    private final String number;
+    private final String pin;
+    private double balance = 0;
+    private boolean hasUnsavedChanges = false;  // Used to control whether Account instance gets updated in database.
+    private boolean inDatabase = false;         // Used to control whether Account instance gets saved in database.
+
     public Account() {
-        this.cardNumber = createCardNumber();
+        this.number = createCardNumber();
         this.pin = createPin();
     }
 
-    public Account(String cardNumber, String pin, double balance) {
-        this.cardNumber = cardNumber;
+    public Account(String number, String pin, double balance) {
+        this.number = number;
         this.pin = pin;
         this.balance = balance;
     }
 
 
+    /**
+     * Returns a random 4 digit PIN number for the account.
+     * @return <code>String</code> 4 digit PIN number for account.
+     */
     private String createPin() {
         Random randomNum = new Random();
         String first = String.valueOf((randomNum.nextInt(10)));
         String second = String.valueOf((randomNum.nextInt(10)));
         String third = String.valueOf((randomNum.nextInt(10)));
         String fourth = String.valueOf((randomNum.nextInt(10)));
-
         return first + second + third + fourth;
     }
 
+
+    /**
+     * Combines IIN, account identifier, and the check sum for a complete valid credit card number.
+     * @return the full card number for the account.
+     */
     private String createCardNumber() {
         String accountIdentifier = getAccountIdentifier();
-        // need to pass IIN + accountIdendifier to method that generates the checksum
-        String cardPrefix = IIN + accountIdentifier; // go ahead and concat these together for convenience
-        String checkSum = getCheckSum(luhnAlgorithm(convertStringToArray(cardPrefix)));
-
+        String cardPrefix = IIN + accountIdentifier;
+        int[] convertedCardPrefix = convertStringToArray(cardPrefix); // Converts the prefix string to array of ints.
+        String checkSum = getCheckSum(convertedCardPrefix);
         return cardPrefix + checkSum;
     }
 
-    private int luhnAlgorithm(int[] prefixArray) {
+    /**
+     * Takes in the first 15 digits of a card number and generates a valid check sum according to the Luhn Algorithm.
+     * @param prefixArray an array of integers representing the first 15 digits of a card number.
+     * @return the valid check sum based on the prefixArray.
+     */
+    private String getCheckSum(int[] prefixArray) {
         int[] updatedArray = new int[prefixArray.length];
         // for every number in prefix array add the number to a new array;
         // if the index + 1 is odd, double it before adding to the new array. ALSO
@@ -63,7 +78,9 @@ public class Account {
                 updatedArray[i] = (2 * prefixArray[i]);
             }
         }
-        return sumArray(updatedArray);
+        int sum = sumArray(updatedArray);
+
+        return convertSumToCheck(sum); // Get and return the check sum from the sum of above algorithm.
     }
 
     private int sumArray(int[] arr) {
@@ -86,11 +103,16 @@ public class Account {
         return prefixArray;
     }
 
-    private String getCheckSum(int luhnSum) {
+    /**
+     * Takes the sum generated within getCheckSum() and creates a check sum according to the Luhn Algorithm.
+     * @param sum the value produced inside the getCheckSum() method.
+     * @return the value of the check sum.
+     */
+    private String convertSumToCheck(int sum) {
         int checkSum = 0;
 
         for (int i = 0; i < CHECK_SUM_UPPER_BOUND; i++) {
-            if ((luhnSum + i) % 10 == 0) {
+            if ((sum + i) % 10 == 0) {
                 checkSum =  i;
             }
         }
