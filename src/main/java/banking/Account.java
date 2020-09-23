@@ -62,10 +62,11 @@ public class Account {
      */
     private String getCheckSum(int[] prefixArray) {
         int[] updatedArray = new int[prefixArray.length];
-        // for every number in prefix array add the number to a new array;
-        // if the index + 1 is odd, double it before adding to the new array. ALSO
-        // if the final number you're adding to the new array is > 9, subtract 9 before
-        // adding
+        /*
+        For every number in prefix array add the number to a new array.
+        If the index + 1 is odd, double it before adding to the new array.
+        Also, if the final number you're adding to the new array is > 9, subtract 9 before adding to array.
+         */
         for (int i = 0; i < prefixArray.length; i++) {
             int currentStep = i + 1; // step in card number; need to reuse i + 1;
             if (currentStep % 2 == 0 && prefixArray[i] > LUHN_MAX) {
@@ -78,11 +79,16 @@ public class Account {
                 updatedArray[i] = (2 * prefixArray[i]);
             }
         }
-        int sum = sumArray(updatedArray);
+        int sum = sumArray(updatedArray); // Gets the sum of the populated array to pass to convertSumToCheck().
 
-        return convertSumToCheck(sum); // Get and return the check sum from the sum of above algorithm.
+        return convertSumToCheck(sum); // Gets and returns the check sum from the sum of above algorithm.
     }
 
+    /**
+     * Takes an array of ints and returns their sum.
+     * @param arr the array of integers to sum.
+     * @return the sum of the given array.
+     */
     private int sumArray(int[] arr) {
         int sum = 0;
         for (int j : arr) {
@@ -91,10 +97,15 @@ public class Account {
         return sum;
     }
 
+    /**
+     * Takes a string representing a credit card number prefix and converts it to an array of individual integers.
+     * @param prefix string representing card number prefix.
+     * @return integer array of credit card number prefix.
+     */
     private int[] convertStringToArray(String prefix) {
-        char[] separateString = prefix.toCharArray();
+        char[] separateString = prefix.toCharArray();   // Separates each character in the string.
 
-        int[] prefixArray = new int[separateString.length];
+        int[] prefixArray = new int[separateString.length]; // Makes a new array to add converted integers to.
 
         for (int i = 0; i < separateString.length; i++) {
             prefixArray[i] = Integer.parseInt(String.valueOf(separateString[i]));
@@ -120,6 +131,10 @@ public class Account {
         return String.valueOf(checkSum);
     }
 
+    /**
+     * Generates a random account identifier for a new card (digits 7 through 15).
+     * @return the randomly generated account identifier.
+     */
     private String getAccountIdentifier() {
         Random randomNum = new Random();
         StringBuilder accountNumTemp = new StringBuilder();
@@ -131,18 +146,34 @@ public class Account {
         return accountNumTemp.toString();
     }
 
+    /**
+     *
+     * @return credit card number for account.
+     */
     public String getCardNumber() {
-        return cardNumber;
+        return number;
     }
 
+    /**
+     *
+     * @return current balance for account.
+     */
     public double getBalance() {
         return balance;
     }
 
+    /**
+     *
+     * @return PIN number for account.
+     */
     public String getPin() {
         return pin;
     }
 
+    /**
+     *
+     * @param balance new balance to set for account.
+     */
     public void setBalance(double balance) {
         this.balance = balance;
     }
@@ -150,7 +181,7 @@ public class Account {
     @Override
     public String toString() {
         return "Account{" +
-                "cardNumber='" + cardNumber + '\'' +
+                "cardNumber='" + number + '\'' +
                 ", pin='" + pin + '\'' +
                 ", balance=" + balance +
                 '}';
