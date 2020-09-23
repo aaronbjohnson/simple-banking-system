@@ -20,6 +20,7 @@ public class Main {
         SQLiteDataSource dataSource = new SQLiteDataSource();
         dataSource.setUrl(url);
 
+        // TODO: this could be separated into a function createTable()
         try (Connection con = dataSource.getConnection()) {
             // Statement creation
             try (Statement statement = con.createStatement()) {
