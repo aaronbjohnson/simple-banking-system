@@ -233,12 +233,23 @@ public class Main {
         }
 
         // create a temporary Account
+        Account tempAcc = new Account(); // make new account (tempAcc)
 
         // store temp account's .getCheckSum()
+        String correctCheckSum = tempAcc.getCheckSum(cardAsIntArray);
+        String finalCardNumber = null;
 
+        if (correctCheckSum.equals(checkToVerify)) {
+            finalCardNumber = cardNum;
+        } else {
+            System.out.println("This is an invalid card number. Please try again.");
+        }
+
+        return finalCardNumber;
     }
 
-    // todo: may need to delete this as we already check for valid cards
+    // todo: delete this if the above validateCard works
+    /*
     private static String validateCard() {
         int luhnMax = 9;
         int checkSumUpperBound = 10;
@@ -300,6 +311,8 @@ public class Main {
         /// end of copying old luhn algorithm
         return finalCardNum;
     }
+
+     */
 
     // TODO: can delete this as it's only used for testing
     private static void printExistingRecords(ArrayList<Account> existing) {

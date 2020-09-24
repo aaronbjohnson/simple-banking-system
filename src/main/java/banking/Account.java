@@ -22,6 +22,12 @@ public class Account {
         this.pin = createPin();
     }
 
+    /**
+     * Creates an account from database records. Only to be used by SELECT statements on database.
+     * @param number the Account's card number.
+     * @param pin the Account's PIN.
+     * @param balance the current Balance of the account.
+     */
     public Account(String number, String pin, double balance) {
         this.number = number;
         this.pin = pin;
@@ -60,7 +66,7 @@ public class Account {
      * @param prefixArray an array of integers representing the first 15 digits of a card number.
      * @return the valid check sum based on the prefixArray.
      */
-    private String getCheckSum(int[] prefixArray) {
+    protected String getCheckSum(int[] prefixArray) {
         int[] updatedArray = new int[prefixArray.length];
         /*
         For every number in prefix array add the number to a new array.
