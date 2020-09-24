@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
+    /*
+    Global constants
+     */
+    private final static String CREATE_ACCOUNT = "1";
+    private final static String LOG_INTO_ACCOUNT = "2";
+    private final static String EXIT = "0";
 
     public static void main(String[] args) {
 
@@ -42,9 +48,11 @@ public class Main {
 
         boolean continueMainMenu = true; // Controls the outer menu loop that displays the main menu.
 
-        //while continueMainMenu is true, keep displaying main menu
+        /*
+        While continueMainMenu is true, keeps displaying main menu.
+         */
         do {
-            String mainMenuChoice = getMainMenuChoice();
+            String mainMenuChoice = getMainMenuChoice(); // Stores the main menu choice received from user.
 
             switch (mainMenuChoice) {
                 case "1":
@@ -347,8 +355,12 @@ public class Main {
         return isExistingAccount;
     }
 
+    /**
+     * Retrieves card Accounts stored in the given database and adds them to the given ArrayList.
+     * @param arrayList the ArrayList where existing records are added.
+     * @param data the connection to the database to retrieve records from.
+     */
     private static void getExistingAccounts(ArrayList<Account> arrayList, SQLiteDataSource data) {
-        // takes in an ArrayList of Accounts and database and adds records from database to the Array of accounts
         try (Connection con = data.getConnection()) {
             try (Statement statement = con.createStatement()) {
                 try (ResultSet tableRecords = statement.executeQuery("SELECT * FROM " + "card")) {
@@ -358,10 +370,8 @@ public class Main {
                         String pin = tableRecords.getString("pin");
                         int balance = tableRecords.getInt("balance");
 
-                        // make new account (tempAcc)
-                        // add it to the sessions sessionAccounts.add(tempAcc)
-                        Account tempAcc = new Account(number, pin, balance);
-                        arrayList.add(tempAcc);
+                        Account tempAcc = new Account(number, pin, balance); // make new account (tempAcc)
+                        arrayList.add(tempAcc); // add it to the sessions sessionAccounts.add(tempAcc)
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -454,16 +464,19 @@ public class Main {
         return tempAcc;
     }
 
+    /**
+     * Displays the main menu and stores the user's menu choice.
+     * @return the user's menu selection.
+     */
     public static String getMainMenuChoice() {
         Scanner input = new Scanner(System.in);
         String answer;
-
         do {
             System.out.println("1. Create an account");
             System.out.println("2. Log into account");
             System.out.println("0. Exit");
             answer = input.next();
-        } while (!answer.equals("1") && !answer.equals("2") && !answer.equals("0"));
+        } while (!answer.equals(CREATE_ACCOUNT) && !answer.equals(LOG_INTO_ACCOUNT) && !answer.equals(EXIT));
 
         return answer;
     }
