@@ -56,11 +56,10 @@ public class Main {
 
             switch (mainMenuChoice) {
                 case CREATE_ACCOUNT:
-                    sessionAccounts.add(createAccount()); // Create a new account and add it to the account Array // todo:return here
+                    sessionAccounts.add(createAccount()); // Creates a new account and adds it to the account Array.
                     break;
                 case LOG_INTO_ACCOUNT:
-                    // call the loginToAccount method
-                    Account userAccount = loginToAccount(existingAccounts,sessionAccounts);
+                    Account userAccount = loginToAccount(sessionAccounts); // Stores the logged-into account.
 
                     if (userAccount != null) {
                         // is the user account an existing account in the database?
@@ -369,7 +368,7 @@ public class Main {
                         int balance = tableRecords.getInt("balance");
 
                         Account tempAcc = new Account(number, pin, balance); // make new account (tempAcc)
-                        tempAcc.in// Sets the Account's inDatabase parameter to TRUE
+                        tempAcc.setInDatabase(true);    // Sets the Account's isInDatabase parameter to TRUE
                         arrayList.add(tempAcc); // add it to the sessions sessionAccounts.add(tempAcc)
                     }
                 } catch (Exception e) {
@@ -419,29 +418,26 @@ public class Main {
         return input.next();
     }
 
-    public static Account loginToAccount(ArrayList<Account> oldAccounts, ArrayList<Account> newAccounts) {
-        // this function will use scanner to get user to enter card num and pin
-        // then will call retrieve account if it matches
-
+    /**
+     * Allows a user to log in to an account if they provide the correct card and PIN number.
+     * @param arr the ArrayList of card Accounts to search.
+     * @return the matching account or null if no match found.
+     */
+    public static Account loginToAccount(ArrayList<Account> arr) {
         Scanner input = new Scanner(System.in);
 
         System.out.println("Enter your card number:");
         String cardNum = input.next();
         System.out.println("Enter your PIN:");
         String pinNum  = input.next();
-
         Account matchingAccount = null;
 
-        // if cardNum in accountList see if PIN is equal that Account's PIN number
-        for (Account acc : oldAccounts) {
-            if (acc.getCardNumber().equals(cardNum) && acc.getPin().equals(pinNum)) {
-                matchingAccount = acc;
-            }
-        }
-
-        for (Account acc : newAccounts) {
-            if (acc.getCardNumber().equals(cardNum) && acc.getPin().equals(pinNum)) {
-                matchingAccount = acc;
+        /*
+         Checks if the given card and PIN match up to an Account in the list of accounts.
+         */
+        for (Account account : arr) {
+            if (account.getNumber().equals(cardNum) && account.getPin().equals(pinNum)) {
+                matchingAccount = account;
             }
         }
 

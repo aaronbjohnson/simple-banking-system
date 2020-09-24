@@ -150,7 +150,7 @@ public class Account {
      *
      * @return credit card number for account.
      */
-    public String getCardNumber() {
+    public String getNumber() {
         return number;
     }
 
