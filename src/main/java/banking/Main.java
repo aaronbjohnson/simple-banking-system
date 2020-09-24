@@ -213,6 +213,31 @@ public class Main {
         return foundAccount;
     }
 
+    private static String validateCard() {
+        Scanner input = new Scanner(System.in);
+
+        System.out.println("Enter card number:");
+        String cardNum = input.next();
+
+        char[] separateString = cardNum.toCharArray(); // separate into array of chars
+
+        /*
+        Stores the entered check sum so it can be compared to the correct check sum.
+         */
+        String checkToVerify = String.valueOf(separateString[separateString.length - 1]); // Strips the last char.
+
+        int[] cardAsIntArray = new int[separateString.length - 1]; // Makes empty int array to hold converted chars from above.
+
+        for (int i = 0; i < separateString.length - 1; i++) {
+            cardAsIntArray[i] = Integer.parseInt(String.valueOf(separateString[i]));
+        }
+
+        // create a temporary Account
+
+        // store temp account's .getCheckSum()
+
+    }
+
     // todo: may need to delete this as we already check for valid cards
     private static String validateCard() {
         int luhnMax = 9;
