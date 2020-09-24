@@ -13,44 +13,34 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String dataBaseName = args[1]; // the second argument passed is the database file name
+        String dataBaseName = args[1]; // The second argument (args[1]) passed is the database file name.
 
-        String url = "jdbc:sqlite:.\\" + dataBaseName; // store the path to the database file
+        String url = "jdbc:sqlite:.\\" + dataBaseName; // Stores the path to the database file.
 
+        /*
+        Creates an SQLite data source and sets its location.
+         */
         SQLiteDataSource dataSource = new SQLiteDataSource();
         dataSource.setUrl(url);
 
-        // TODO: this could be separated into a function createTable()
-        try (Connection con = dataSource.getConnection()) {
-            // Statement creation
-            try (Statement statement = con.createStatement()) {
-                statement.executeUpdate("CREATE TABLE IF NOT EXISTS card(" +
-                        "id INTEGER PRIMARY KEY," +
-                        "number TEXT NOT NULL," +
-                        "pin TEXT," +
-                        "balance INTEGER DEFAULT 0)");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        /*
+        Creates a table of card accounts if one doesn't already exist.
+         */
+        createTable(dataSource);
 
-        // Retrieve the existing accounts from the database
-        ArrayList<Account> existingAccounts = new ArrayList<>();
-
-        // populate existingAccounts with records from database
-        // this populates empty existingAccounts array with records from given data source and given table
-        getExistingAccounts(existingAccounts, dataSource);
-
-
-        //MAKE AN ARRAYLIST HERE  to store created accounts for a given session.
+        /*
+        Creates an Array List that stores existing accounts in the database as well as any new cards created during
+        a session.
+         */
         ArrayList<Account> sessionAccounts = new ArrayList<>();
 
-        //printExistingRecords(existingAccounts);
+        /*
+        Populates sessionAccounts with Accounts store in the database.
+         */
+        getExistingAccounts(sessionAccounts, dataSource);
 
-        // control outer menu loop
-        boolean continueMainMenu = true;
+
+        boolean continueMainMenu = true; // Controls the outer menu loop that displays the main menu.
 
         //while continueMainMenu is true, keep displaying main menu
         do {
@@ -153,6 +143,27 @@ public class Main {
         updateDatabase(sessionAccounts,url);
     }
 
+    /**
+     * Creates a table of card accounts if one does not already exist.
+     * @param data the connection to the database where the table is created.
+     */
+    private static void createTable(SQLiteDataSource data) {
+        try (Connection con = data.getConnection()) {
+            // Statement creation
+            try (Statement statement = con.createStatement()) {
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS card(" +
+                        "id INTEGER PRIMARY KEY," +
+                        "number TEXT NOT NULL," +
+                        "pin TEXT," +
+                        "balance INTEGER DEFAULT 0)");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static void closeAccount(Account account, boolean isInDatabase, ArrayList<Account> oldAcc, ArrayList<Account> newAcc, SQLiteDataSource data) {
 
         if (isInDatabase) {
@@ -213,7 +224,7 @@ public class Main {
 
         int enteredCheck = cardAsIntArray[cardAsIntArray.length - 1];
 
-        /// start of copying old luhm alrogithm
+        /// start of copying old luhn alrogithm
         int[] updatedArray = new int[cardAsIntArray.length - 1];
 
         for (int i = 0; i < cardAsIntArray.length - 1; i++) {
