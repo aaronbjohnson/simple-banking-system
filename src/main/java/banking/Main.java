@@ -94,8 +94,9 @@ public class Main {
                                 case DO_TRANSFER:
                                     System.out.println("Transfer");
 
-                                    // Call validDateCard to get card number and ensure it passes Luhn algorithm
-                                    // this method should return the valid card because we actually get the card number here too
+                                    /*
+                                    Calls validDateCard() to get the card number and ensure it passes Luhn algorithm.
+                                     */
                                     String cardNumber = validateCard();
 
                                     Account receivingAccount = getDestinationAccount(cardNumber, existingAccounts, sessionAccounts);
