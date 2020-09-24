@@ -15,6 +15,11 @@ public class Main {
      */
     private final static String CREATE_ACCOUNT = "1";
     private final static String LOG_INTO_ACCOUNT = "2";
+    private final static String CHECK_BALANCE = "1";
+    private final static String ADD_INCOME = "2";
+    private final static String DO_TRANSFER = "3";
+    private final static String CLOSE_ACCOUNT = "4";
+    private final static String LOG_OUT = "5";
     private final static String EXIT = "0";
 
     public static void main(String[] args) {
@@ -61,33 +66,32 @@ public class Main {
                 case LOG_INTO_ACCOUNT:
                     Account userAccount = loginToAccount(sessionAccounts); // Stores the logged-into account.
 
+                    /*
+                    If the login was successful and returned an account, display the account menu.
+                     */
                     if (userAccount != null) {
+                        // TODO: delete this stuff...
                         // is the user account an existing account in the database?
                         // this will be used to control whether we have to update database in addition to ArrayList(s)
-                        boolean isExistingAccount = isInDatabase(userAccount, existingAccounts);
+                        // boolean isExistingAccount = isInDatabase(userAccount, existingAccounts);
                         System.out.println("You have successfully logged in!\n");
                         boolean loggedIn = true;
 
-                        label:
                         while (loggedIn) {
                             String acctMenuChoice =  getAccountMenuChoice();
 
                             switch (acctMenuChoice) {
-                                case "1":
+                                case CHECK_BALANCE:
                                     System.out.println("\nBalance: " + userAccount.getBalance());
                                     System.out.println();
                                     break;
-                                case "2":
+                                case ADD_INCOME:
                                     System.out.println("Enter income:");
-
-                                    // get the amount to add from user
-                                    double incomeAmount = getAmount();
-
-                                    // add the income to the account
-                                    addIncome(userAccount, incomeAmount, isExistingAccount, dataSource);
+                                    double incomeAmount = getAmount(); // Gets the amount to add from the user.
+                                    addIncome(userAccount, incomeAmount);// Adds the income to the account.
                                     System.out.println("Income was added!");
                                     break;
-                                case "3":
+                                case DO_TRANSFER:
                                     System.out.println("Transfer");
 
                                     // Call validDateCard to get card number and ensure it passes Luhn algorithm
@@ -121,21 +125,21 @@ public class Main {
                                         System.out.println("Such a card does not exist");
                                     }
                                     break;
-                                case "4":
+                                case CLOSE_ACCOUNT:
                                     closeAccount(userAccount, isExistingAccount, existingAccounts, sessionAccounts, dataSource);
                                     loggedIn = false;
-                                case "5":
+                                case LOG_OUT:
                                     System.out.println("\nYou have successfully logged out!\n");
                                     loggedIn = false;
                                     break;
-                                case "0":
+                                case EXIT:
                                     System.out.println("\nBye!\n");
                                     continueMainMenu = false;
-                                    break label;
+                                    break;
                             }
                         }
                     }
-                    break;
+                    break; // If no account was logged into, returns to the main menu.
                 case EXIT:
                     // end the program
                     System.out.println("\nBye!\n");
@@ -279,11 +283,19 @@ public class Main {
         }
     }
 
-    private static void addIncome(Account acc, double amount, boolean isOldAccount, SQLiteDataSource data) {
+    private static void addIncome(Account acc, double amount) {
         // connect to database
         double newBalance = acc.getBalance() + amount;
 
-        if (isOldAccount) {
+        // todo: delete all this if working.. @remove
+        // this is where we take advantage of the inDatabase and hasUnsaved changes
+
+        // if the account is in the database
+            // acc.setBalance(newBalance);
+            // acc.setUnsaved(true);
+
+        /*
+        if (acc.isInDatabase()) {
             // if the account is an existing account, need to update in database AND in ArrayList of existing accounts
 
             // update the database record
@@ -299,7 +311,12 @@ public class Main {
                 e.printStackTrace();
             }
         }
+
+         */
         // update the ArrayList record
+        if (acc.isInDatabase()) {
+            acc.setUnsaved(true);
+        }
         acc.setBalance(newBalance);
     }
 
@@ -327,6 +344,10 @@ public class Main {
         acc.setBalance(newBalance);
     }
 
+    /**
+     * Gets an amount from the user.
+     * @return the amount entered by the user.
+     */
     private static double getAmount() {
         Scanner input = new Scanner(System.in);
         double amount = 0;
