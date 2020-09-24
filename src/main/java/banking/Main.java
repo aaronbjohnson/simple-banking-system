@@ -55,12 +55,10 @@ public class Main {
             String mainMenuChoice = getMainMenuChoice(); // Stores the main menu choice received from user.
 
             switch (mainMenuChoice) {
-                case "1":
-                    // call the createAccount method
-                    sessionAccounts.add(createAccount());
-
+                case CREATE_ACCOUNT:
+                    sessionAccounts.add(createAccount()); // Create a new account and add it to the account Array // todo:return here
                     break;
-                case "2":
+                case LOG_INTO_ACCOUNT:
                     // call the loginToAccount method
                     Account userAccount = loginToAccount(existingAccounts,sessionAccounts);
 
@@ -139,7 +137,7 @@ public class Main {
                         }
                     }
                     break;
-                case "0":
+                case EXIT:
                     // end the program
                     System.out.println("\nBye!\n");
                     continueMainMenu = false;
@@ -371,6 +369,7 @@ public class Main {
                         int balance = tableRecords.getInt("balance");
 
                         Account tempAcc = new Account(number, pin, balance); // make new account (tempAcc)
+                        tempAcc.in// Sets the Account's inDatabase parameter to TRUE
                         arrayList.add(tempAcc); // add it to the sessions sessionAccounts.add(tempAcc)
                     }
                 } catch (Exception e) {

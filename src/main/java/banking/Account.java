@@ -14,8 +14,8 @@ public class Account {
     private final String number;
     private final String pin;
     private double balance = 0;
-    private boolean hasUnsavedChanges = false;  // Used to control whether Account instance gets updated in database.
-    private boolean inDatabase = false;         // Used to control whether Account instance gets saved in database.
+    private boolean isUnsaved = false;  // Used to control whether Account instance gets updated in database.
+    private boolean isInDatabase = false;         // Used to control whether Account instance gets saved in database.
 
     public Account() {
         this.number = createCardNumber();
@@ -176,6 +176,22 @@ public class Account {
      */
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public boolean isUnsaved() {
+        return isUnsaved;
+    }
+
+    public void setUnsaved(boolean unsaved) {
+        isUnsaved = unsaved;
+    }
+
+    public boolean isInDatabase() {
+        return isInDatabase;
+    }
+
+    public void setInDatabase(boolean inDatabase) {
+        isInDatabase = inDatabase;
     }
 
     @Override
