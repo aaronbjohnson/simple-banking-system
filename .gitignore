@@ -1,3 +1,5 @@
+/.gradle/
+
 # Default ignored files
 /shelf/
 /workspace.xml
@@ -44,3 +46,4 @@ gradle-app.setting
 .idea/
 
 card.s3db
+.gradle/6.3/executionHistory/executionHistory.lock
