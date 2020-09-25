@@ -74,10 +74,6 @@ public class Main {
                     If the login was successful and returned an account, display the account menu.
                      */
                     if (userAccount != null) {
-                        // TODO: delete this stuff...
-                        // is the user account an existing account in the database?
-                        // this will be used to control whether we have to update database in addition to ArrayList(s)
-                        // boolean isExistingAccount = isInDatabase(userAccount, existingAccounts);
                         System.out.println("You have successfully logged in!\n");
                         boolean loggedIn = true;
 
@@ -147,9 +143,7 @@ public class Main {
             }
         } while (continueMainMenu);
 
-        // Add accounts created during a session to the database to save
-        //updateDatabase(sessionAccounts,url); // todo: delete this
-        saveChanges(sessionAccounts, dataSource);
+        saveChanges(sessionAccounts, dataSource); // Updates database to reflect new Accounts and changes to old accounts.
 
         // TODO: JUST TO SEE ACCOUNTS...DELETE THIS WHEN DONE @remove
         System.out.println("\nRecords at the end of the program\n");
@@ -242,27 +236,6 @@ public class Main {
                 e.printStackTrace();
             }
         }
-
-        // OLD PARAMETERS: Account account, boolean isInDatabase, ArrayList<Account> oldAcc, ArrayList<Account> newAcc, SQLiteDataSource data
-        /*
-        if (isInDatabase) {
-            try (Connection con = data.getConnection()) {
-                try (Statement statement = con.createStatement()) {
-                    statement.executeUpdate("DELETE FROM card WHERE number = " + account.getCardNumber() + ";");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            oldAcc.removeIf(acc -> account.getCardNumber().equals(acc.getCardNumber()));
-        } else {
-            newAcc.removeIf(acc -> account.getCardNumber().equals(acc.getCardNumber()));
-        }
-        System.out.println("The account has been closed!");
-
-         */
         if (accountRemoved) {
             System.out.println("The account has been closed.");
 
@@ -325,72 +298,6 @@ public class Main {
         return finalCardNumber;
     }
 
-    // todo: delete this if the above validateCard works
-    /*
-    private static String validateCard() {
-        int luhnMax = 9;
-        int checkSumUpperBound = 10;
-        Scanner input = new Scanner(System.in);
-
-        System.out.println("Enter card number:");
-        String cardNum = input.next();
-
-        // does this pass the luhn algorithm?
-        char[] separateString = cardNum.toCharArray();
-
-        int[] cardAsIntArray = new int[separateString.length];
-
-        for (int i = 0; i < separateString.length; i++) {
-            cardAsIntArray[i] = Integer.parseInt(String.valueOf(separateString[i]));
-        }
-
-        int enteredCheck = cardAsIntArray[cardAsIntArray.length - 1];
-
-        /// start of copying old luhn algorithm
-        int[] updatedArray = new int[cardAsIntArray.length - 1];
-
-        for (int i = 0; i < cardAsIntArray.length - 1; i++) {
-            int currentStep = i + 1; // step in card number; need to reuse i + 1;
-            if (currentStep % 2 == 0 && cardAsIntArray[i] > luhnMax) {
-                updatedArray[i] = cardAsIntArray[i] - luhnMax;
-            } else if (currentStep % 2 == 0) {
-                updatedArray[i] = cardAsIntArray[i];
-            } else if ((2 * cardAsIntArray[i]) > luhnMax) {
-                updatedArray[i] = (2 * cardAsIntArray[i]) - 9;
-            } else {
-                updatedArray[i] = (2 * cardAsIntArray[i]);
-            }
-        }
-
-        int sum = 0;
-        for (int j : updatedArray) {
-            sum += j;
-        }
-
-        int checkSum = 0;
-
-        for (int i = 0; i < checkSumUpperBound; i++) {
-            if ((sum + i) % 10 == 0) {
-                checkSum =  i;
-            }
-        }
-
-        String checkString = String.valueOf(checkSum);
-        String enteredCheckString = String.valueOf(enteredCheck);
-
-        String finalCardNum = null;
-
-        if (checkString.equals(enteredCheckString)) {
-            finalCardNum = cardNum;
-        } else {
-            System.out.println("Probably you made a mistake in the card number. Please try again!");
-        }
-        /// end of copying old luhn algorithm
-        return finalCardNum;
-    }
-
-     */
-
     // TODO: can delete this as it's only used for testing
     private static void printExistingRecords(ArrayList<Account> existing) {
         for (Account acc : existing) {
@@ -401,33 +308,6 @@ public class Main {
     private static void addIncome(Account acc, double amount) {
         // connect to database
         double newBalance = acc.getBalance() + amount;
-
-        // todo: delete all this if working.. @remove
-        // this is where we take advantage of the inDatabase and hasUnsaved changes
-
-        // if the account is in the database
-            // acc.setBalance(newBalance);
-            // acc.setUnsaved(true);
-
-        /*
-        if (acc.isInDatabase()) {
-            // if the account is an existing account, need to update in database AND in ArrayList of existing accounts
-
-            // update the database record
-            try (Connection con = data.getConnection()) {
-                try (Statement statement = con.createStatement()) {
-                    statement.executeUpdate("UPDATE " + "card " +
-                            "SET balance = " + newBalance + " " +
-                            "WHERE number = " + acc.getCardNumber() + ";");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-         */
         // update the ArrayList record
         if (acc.isInDatabase()) {
             acc.setUnsaved(true); // Flag the account as having unsaved changes.
@@ -444,25 +324,6 @@ public class Main {
         // connect to database
         double newBalance = acc.getBalance() - amount;
 
-        // TODO: this will be put at the very end when we update database @remove
-        /*
-        if (isOldAccount) {
-            // if the account is an existing account, need to update in database AND in ArrayList of existing accounts
-
-            // update the database record
-            try (Connection con = data.getConnection()) {
-                try (Statement statement = con.createStatement()) {
-                    statement.executeUpdate("UPDATE " + "card " +
-                            "SET balance = " + newBalance + " " +
-                            "WHERE number = " + acc.getCardNumber() + ";");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        */
         if (acc.isInDatabase()) {
             acc.setUnsaved(true); // Flag the account as having unsaved changes.
         }
@@ -485,24 +346,6 @@ public class Main {
         }
         return amount;
     }
-
-    // todo: will delete the isInDatabase method...
-/*
-    private static boolean isInDatabase(Account userAccount, ArrayList<Account> oldAccounts) {
-        //all I have to do here is check if the account is in the ArrayList of existing accounts because I've already
-        // populated it..so might as well just look there.
-        boolean isExistingAccount = false;
-
-        for (Account acc : oldAccounts) {
-            if (acc.getCardNumber().equals(userAccount.getCardNumber())) {
-                isExistingAccount = true;
-                break;
-            }
-        }
-        return isExistingAccount;
-    }
-
- */
 
     /**
      * Retrieves card Accounts stored in the given database and adds them to the given ArrayList.
@@ -547,31 +390,6 @@ public class Main {
             e.printStackTrace();
         }
     }
-
-    /*
-    private static void updateDatabase(ArrayList<Account> arr, String dbLoc) {
-        // takes array of accounts and a database location
-
-        SQLiteDataSource dataSource = new SQLiteDataSource();
-        dataSource.setUrl(dbLoc);
-
-        try (Connection con = dataSource.getConnection()) {
-            // Statement creation
-            // for every account in session account, add it to the database
-            for (Account acc : arr) {
-                try (Statement statement = con.createStatement()) {
-                    statement.executeUpdate("INSERT INTO card (number, pin, balance) VALUES " +
-                            "('" + acc.getCardNumber() + "', '" + acc.getPin() + "', " + acc.getBalance() + ")");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-     */
 
     public static String getAccountMenuChoice() {
         Scanner input = new Scanner(System.in);
