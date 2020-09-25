@@ -111,7 +111,7 @@ public class Main {
                                     if (receivingAccount != null) {
                                         // todo: may need to put try statement here as we can't use "break" under the sout "not enough money"
 
-                                        transferFunds(userAccount, receivingAccount);
+                                        transferFunds(userAccount, receivingAccount); // todo: need to test this @test
                                     } else {
                                         System.out.println("Such a card does not exist");
                                     }
@@ -184,8 +184,29 @@ public class Main {
         }
     }
 
-    private static void closeAccount(Account account, boolean isInDatabase, ArrayList<Account> oldAcc, ArrayList<Account> newAcc, SQLiteDataSource data) {
+    /**
+     * Deletes an account from the database and removes it from the list of accounts.
+     * @param account the account to be closed.
+     * @param accounts the list of accounts the account will be removed from.
+     * @param data the connection to the database.
+     */
+    private static void closeAccount(Account account, ArrayList<Account> accounts, SQLiteDataSource data) {
+        boolean accountRemoved = accounts.removeIf(acc -> account.getNumber().equals(acc.getNumber()));
 
+        if (account.isInDatabase()) {
+            try (Connection con = data.getConnection()) {
+                try (Statement statement = con.createStatement()) {
+                    statement.executeUpdate("DELETE FROM card WHERE number = " + account.getNumber() + ";");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // OLD PARAMETERS: Account account, boolean isInDatabase, ArrayList<Account> oldAcc, ArrayList<Account> newAcc, SQLiteDataSource data
+        /*
         if (isInDatabase) {
             try (Connection con = data.getConnection()) {
                 try (Statement statement = con.createStatement()) {
@@ -202,6 +223,14 @@ public class Main {
             newAcc.removeIf(acc -> account.getCardNumber().equals(acc.getCardNumber()));
         }
         System.out.println("The account has been closed!");
+
+         */
+        if (accountRemoved) {
+            System.out.println("The account has been closed.");
+
+        } else {
+            System.out.println("Unable to close the account.");
+        }
     }
 
 
