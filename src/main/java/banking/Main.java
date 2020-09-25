@@ -50,6 +50,10 @@ public class Main {
          */
         getExistingAccounts(sessionAccounts, dataSource);
 
+        // TODO: JUST TO SEE ACCOUNTS...DELETE THIS WHEN DONE @remove
+        System.out.println("\nRecords at the beginning of the program\n");
+        printExistingRecords(sessionAccounts);
+
 
         boolean continueMainMenu = true; // Controls the outer menu loop that displays the main menu.
 
@@ -97,23 +101,26 @@ public class Main {
                                     /*
                                     Calls validDateCard() to get the card number and ensure it passes Luhn algorithm.
                                      */
+                                    //todo: should do if statement here, if invalid, break
                                     String cardNumber = validateCard();
 
-                                    /*
-                                    Gets the account to send money to.
-                                     */
-                                    Account receivingAccount = getDestinationAccount(cardNumber, sessionAccounts);
+                                    if (cardNumber != null) {
+                                        /*
+                                        Gets the account to send money to.
+                                        */
+                                        Account receivingAccount = getDestinationAccount(cardNumber, sessionAccounts);
 
-                                    /*
-                                    If an account to send money to was successfully retrieved, transfers the money.
-                                    Otherwise display error message.
-                                     */
-                                    if (receivingAccount != null) {
-                                        // todo: may need to put try statement here as we can't use "break" under the sout "not enough money"
+                                        /*
+                                        If an account to send money to was successfully retrieved, transfers the money.
+                                        Otherwise display error message.
+                                        */
+                                        if (receivingAccount != null) {
+                                            // todo: may need to put try statement here as we can't use "break" under the sout "not enough money"
 
-                                        transferFunds(userAccount, receivingAccount); // todo: need to test this @test
-                                    } else {
-                                        System.out.println("Such a card does not exist");
+                                            transferFunds(userAccount, receivingAccount); // todo: need to test this @test
+                                        } else {
+                                            System.out.println("Such a card does not exist");
+                                        }
                                     }
                                     break;
                                 case CLOSE_ACCOUNT:
@@ -126,6 +133,7 @@ public class Main {
                                     break;
                                 case EXIT:
                                     System.out.println("\nBye!\n");
+                                    loggedIn = false;
                                     continueMainMenu = false;
                                     break;
                             }
@@ -142,6 +150,10 @@ public class Main {
         // Add accounts created during a session to the database to save
         //updateDatabase(sessionAccounts,url); // todo: delete this
         saveChanges(sessionAccounts, dataSource);
+
+        // TODO: JUST TO SEE ACCOUNTS...DELETE THIS WHEN DONE @remove
+        System.out.println("\nRecords at the end of the program\n");
+        printExistingRecords(sessionAccounts);
     }
 
     private static void saveChanges(ArrayList<Account> accounts, SQLiteDataSource data) {
