@@ -117,8 +117,9 @@ public class Main {
                                     }
                                     break;
                                 case CLOSE_ACCOUNT:
-                                    closeAccount(userAccount, isExistingAccount, existingAccounts, sessionAccounts, dataSource);
+                                    closeAccount(userAccount, sessionAccounts, dataSource);
                                     loggedIn = false;
+                                    break;
                                 case LOG_OUT:
                                     System.out.println("\nYou have successfully logged out!\n");
                                     loggedIn = false;
@@ -132,15 +133,40 @@ public class Main {
                     }
                     break; // If no account was logged into, returns to the main menu.
                 case EXIT:
-                    // end the program
                     System.out.println("\nBye!\n");
-                    continueMainMenu = false;
+                    continueMainMenu = false; // Ends the program.
                     break;
             }
         } while (continueMainMenu);
 
         // Add accounts created during a session to the database to save
-        updateDatabase(sessionAccounts,url);
+        //updateDatabase(sessionAccounts,url); // todo: delete this
+        saveChanges(sessionAccounts, dataSource);
+    }
+
+    private static void saveChanges(ArrayList<Account> accounts, SQLiteDataSource data) {
+        for (Account acc : accounts) {
+            if (acc.isInDatabase() && acc.isUnsaved()) {
+                updateDatabase(acc, data);
+                acc.setUnsaved(false); // Flag the account as having changes saved.
+            } else if (!acc.isInDatabase()) {
+                addToDatabase(acc, data);
+            }
+        }
+    }
+
+    private static void addToDatabase(Account account, SQLiteDataSource data) {
+        try (Connection con = data.getConnection()) {
+            try (Statement statement = con.createStatement()) {
+                statement.executeUpdate("INSERT INTO card (number, pin, balance) VALUES " +
+                        "('" + account.getNumber() + "', '" + account.getPin() + "', " + account.getBalance() + ")");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void transferFunds(Account sourceAccount, Account targetAccount) {
@@ -308,7 +334,7 @@ public class Main {
 
         int enteredCheck = cardAsIntArray[cardAsIntArray.length - 1];
 
-        /// start of copying old luhn alrogithm
+        /// start of copying old luhn algorithm
         int[] updatedArray = new int[cardAsIntArray.length - 1];
 
         for (int i = 0; i < cardAsIntArray.length - 1; i++) {
@@ -448,6 +474,8 @@ public class Main {
         return amount;
     }
 
+    // todo: will delete the isInDatabase method...
+/*
     private static boolean isInDatabase(Account userAccount, ArrayList<Account> oldAccounts) {
         //all I have to do here is check if the account is in the ArrayList of existing accounts because I've already
         // populated it..so might as well just look there.
@@ -461,6 +489,8 @@ public class Main {
         }
         return isExistingAccount;
     }
+
+ */
 
     /**
      * Retrieves card Accounts stored in the given database and adds them to the given ArrayList.
@@ -492,6 +522,21 @@ public class Main {
         }
     }
 
+    private static void updateDatabase(Account account, SQLiteDataSource data) {
+        try (Connection con = data.getConnection()) {
+            try (Statement statement = con.createStatement()) {
+                statement.executeUpdate("UPDATE " + "card " +
+                        "SET balance = " + account.getBalance() + " " +
+                        "WHERE number = " + account.getNumber() + ";");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*
     private static void updateDatabase(ArrayList<Account> arr, String dbLoc) {
         // takes array of accounts and a database location
 
@@ -513,6 +558,8 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+     */
 
     public static String getAccountMenuChoice() {
         Scanner input = new Scanner(System.in);
@@ -561,9 +608,10 @@ public class Main {
     public static Account createAccount() {
         // this function will create a new anonymous Account and add it to the list of account for this session
         Account tempAcc = new Account();
+        tempAcc.setInDatabase(false); // Flag the new account as not having a place in database yet.
         System.out.println("Your card has been created");
         System.out.println("Your card number:");
-        System.out.println(tempAcc.getCardNumber());
+        System.out.println(tempAcc.getNumber());
         System.out.println("Your card PIN:");
         System.out.println(tempAcc.getPin());
         return tempAcc;
