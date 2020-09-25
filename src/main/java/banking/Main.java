@@ -195,18 +195,17 @@ public class Main {
     }
 
 
-    private static Account getDestinationAccount(String cardNumber, ArrayList<Account> oldAccounts, ArrayList<Account> newAccounts) {
+    /**
+     * Searches for and retrieves an account in a given list of accounts by credit card number.
+     * @param cardNumber the credit card number to search for.
+     * @param accounts the list of accounts to search.
+     * @return the matching account if found, null if not found.
+     */
+    private static Account getDestinationAccount(String cardNumber, ArrayList<Account> accounts) {
         Account foundAccount = null;
 
-        for (Account acc : oldAccounts) {
-            if (acc.getCardNumber().equals(cardNumber)) { // todo: this might cause problems...its just a copy/paste
-                foundAccount = acc;
-                break;
-            }
-        }
-
-        for (Account acc : newAccounts) {
-            if (acc.getCardNumber().equals(cardNumber)) {
+        for (Account acc : accounts) {
+            if (acc.getNumber().equals(cardNumber)) {
                 foundAccount = acc;
                 break;
             }
