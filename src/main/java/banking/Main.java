@@ -99,29 +99,19 @@ public class Main {
                                      */
                                     String cardNumber = validateCard();
 
-                                    Account receivingAccount = getDestinationAccount(cardNumber, existingAccounts, sessionAccounts);
+                                    /*
+                                    Gets the account to send money to.
+                                     */
+                                    Account receivingAccount = getDestinationAccount(cardNumber, sessionAccounts);
 
-                                    if (receivingAccount != null) { // if cardNumber isn't null: continue
-                                        // continue with transfer...
+                                    /*
+                                    If an account to send money to was successfully retrieved, transfers the money.
+                                    Otherwise display error message.
+                                     */
+                                    if (receivingAccount != null) {
+                                        // todo: may need to put try statement here as we can't use "break" under the sout "not enough money"
 
-                                        // is receivingAccount in database
-                                        boolean receivingAccountInDatabase = isInDatabase(receivingAccount, existingAccounts);
-
-                                        System.out.println("Enter how much you want to transfer");
-                                        double transferAmount = getAmount();
-                                        //processTransfer(userAccount, receivingAccount, transferAmount);
-                                        if (userAccount == receivingAccount) {
-                                            System.out.println("You can't transfer money to the same account!");
-                                        } else {
-                                            if ((userAccount.getBalance() - transferAmount) > 0) {
-                                                subtractIncome(userAccount, transferAmount, isExistingAccount, dataSource);
-                                                addIncome(receivingAccount, transferAmount, receivingAccountInDatabase, dataSource);
-                                                System.out.println("Success!");
-                                            } else {
-                                                System.out.println("Not enough money!");
-                                                break;
-                                            }
-                                        }
+                                        transferFunds(userAccount, receivingAccount);
                                     } else {
                                         System.out.println("Such a card does not exist");
                                     }
@@ -151,6 +141,26 @@ public class Main {
 
         // Add accounts created during a session to the database to save
         updateDatabase(sessionAccounts,url);
+    }
+
+    private static void transferFunds(Account sourceAccount, Account targetAccount) {
+        System.out.println("Enter how much you want to transfer");
+        double transferAmount = getAmount();
+
+        if (sourceAccount == targetAccount) {
+            System.out.println("You can't transfer money to the same account!");
+        } else {
+            /*
+            If the source Account has enough money, do transfer.
+             */
+            if ((sourceAccount.getBalance() - transferAmount) > 0) {
+                subtractIncome(sourceAccount, transferAmount);
+                addIncome(targetAccount, transferAmount);
+                System.out.println("Success!");
+            } else {
+                System.out.println("Not enough money!");
+            }
+        }
     }
 
     /**
@@ -353,15 +363,22 @@ public class Main {
          */
         // update the ArrayList record
         if (acc.isInDatabase()) {
-            acc.setUnsaved(true);
+            acc.setUnsaved(true); // Flag the account as having unsaved changes.
         }
         acc.setBalance(newBalance);
     }
 
-    private static void subtractIncome(Account acc, double amount, boolean isOldAccount, SQLiteDataSource data) {
+    /**
+     * Subtracts the given amount from an Account's balance.
+     * @param acc the account to subtract money from
+     * @param amount the amount to subtract from the Account's balance.
+     */
+    private static void subtractIncome(Account acc, double amount) {
         // connect to database
         double newBalance = acc.getBalance() - amount;
 
+        // TODO: this will be put at the very end when we update database @remove
+        /*
         if (isOldAccount) {
             // if the account is an existing account, need to update in database AND in ArrayList of existing accounts
 
@@ -378,6 +395,11 @@ public class Main {
                 e.printStackTrace();
             }
         }
+        */
+        if (acc.isInDatabase()) {
+            acc.setUnsaved(true); // Flag the account as having unsaved changes.
+        }
+
         // update the ArrayList record
         acc.setBalance(newBalance);
     }
