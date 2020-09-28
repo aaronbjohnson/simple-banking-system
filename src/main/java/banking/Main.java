@@ -50,9 +50,7 @@ public class Main {
          */
         getExistingAccounts(sessionAccounts, dataSource);
 
-        // TODO: JUST TO SEE ACCOUNTS...DELETE THIS WHEN DONE @remove
-        System.out.println("\nRecords at the beginning of the program\n");
-        printExistingRecords(sessionAccounts);
+        //printExistingRecords(sessionAccounts); // used for testing
 
 
         boolean continueMainMenu = true; // Controls the outer menu loop that displays the main menu.
@@ -145,11 +143,14 @@ public class Main {
 
         saveChanges(sessionAccounts, dataSource); // Updates database to reflect new Accounts and changes to old accounts.
 
-        // TODO: JUST TO SEE ACCOUNTS...DELETE THIS WHEN DONE @remove
-        System.out.println("\nRecords at the end of the program\n");
-        printExistingRecords(sessionAccounts);
+        //printExistingRecords(sessionAccounts); // only used for testing
     }
 
+    /**
+     * Given an array of Accounts and a connection to a database, saves/updates Accounts in database.
+     * @param accounts array of Accounts to check for changes to save.
+     * @param data the connection to the database.
+     */
     private static void saveChanges(ArrayList<Account> accounts, SQLiteDataSource data) {
         for (Account acc : accounts) {
             if (acc.isInDatabase() && acc.isUnsaved()) {
@@ -161,6 +162,11 @@ public class Main {
         }
     }
 
+    /**
+     * Given an Account and a connection to a database, adds the Account to the database.
+     * @param account the Account to add to the database.
+     * @param data the connection to the database.
+     */
     private static void addToDatabase(Account account, SQLiteDataSource data) {
         try (Connection con = data.getConnection()) {
             try (Statement statement = con.createStatement()) {
@@ -175,6 +181,11 @@ public class Main {
         }
     }
 
+    /**
+     * Transfers funds from a source Account to a target Account.
+     * @param sourceAccount the Account to subtract funds from.
+     * @param targetAccount the Account to add funds to.
+     */
     private static void transferFunds(Account sourceAccount, Account targetAccount) {
         System.out.println("Enter how much you want to transfer");
         double transferAmount = getAmount();
@@ -298,13 +309,22 @@ public class Main {
         return finalCardNumber;
     }
 
-    // TODO: can delete this as it's only used for testing
-    private static void printExistingRecords(ArrayList<Account> existing) {
+    /*
+    Only used for testing
+     */
+    /*
+     private static void printExistingRecords(ArrayList<Account> existing) {
         for (Account acc : existing) {
             System.out.println( acc.toString());
         }
     }
+     */
 
+    /**
+     * Adds a given amount to the given Account's balance.
+     * @param acc the Account to add funds to.
+     * @param amount the amount to add to the Account.
+     */
     private static void addIncome(Account acc, double amount) {
         // connect to database
         double newBalance = acc.getBalance() + amount;
@@ -377,6 +397,11 @@ public class Main {
         }
     }
 
+    /**
+     * Updates database with changes to a particular Account.
+     * @param account the Account to update.
+     * @param data the connection to the database.
+     */
     private static void updateDatabase(Account account, SQLiteDataSource data) {
         try (Connection con = data.getConnection()) {
             try (Statement statement = con.createStatement()) {
@@ -391,6 +416,10 @@ public class Main {
         }
     }
 
+    /**
+     * Displays a menu for operations to perform on an Account.
+     * @return the user's menu choice for operation on an account.
+     */
     public static String getAccountMenuChoice() {
         Scanner input = new Scanner(System.in);
 
@@ -434,7 +463,10 @@ public class Main {
         return matchingAccount;
     }
 
-
+    /**
+     * Creates a new instance of an Account.
+     * @return the new Account.
+     */
     public static Account createAccount() {
         // this function will create a new anonymous Account and add it to the list of account for this session
         Account tempAcc = new Account();
