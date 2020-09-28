@@ -184,22 +184,42 @@ public class Account {
         this.balance = balance;
     }
 
+    /**
+     *
+     * @return true if an Account has unsaved changes.
+     */
     public boolean isUnsaved() {
         return isUnsaved;
     }
 
+    /**
+     *
+     * @param unsaved sets whether an Account has unsaved changes.
+     */
     public void setUnsaved(boolean unsaved) {
         isUnsaved = unsaved;
     }
 
+    /**
+     *
+     * @return true if an Account is in the database.
+     */
     public boolean isInDatabase() {
         return isInDatabase;
     }
 
+    /**
+     *
+     * @param inDatabase sets whether an Account is in the database.
+     */
     public void setInDatabase(boolean inDatabase) {
         isInDatabase = inDatabase;
     }
 
+    /**
+     *
+     * @return String showing information about an account.
+     */
     @Override
     public String toString() {
         return "Account{" +
